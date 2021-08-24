@@ -1,0 +1,29 @@
+-Simple welcome page
+http://localhost:8080/blog
+
+--Admin page 
+http://localhost:8080/blog/admin
+
+--Valid URLs
+--provide list of users
+http://localhost:8080/blog/admin/users
+--pass the param to see list specific user details (valid values 1 to 10, rest should give error)
+http://localhost:8080/blog/admin/users/2
+--all posts by all users
+http://localhost:8080/blog/admin/posts
+--view post by post id (valid values from 1 to 100)
+http://localhost:8080/blog/admin/posts/4
+--post  by particular user (valid values 1 to 10)
+http://localhost:8080/blog/admin/usersposts/1
+
+--create post on behalf
+http://localhost:8080/blog/admin/users/createpost
+
+--audit info
+http://localhost:8080/blog/admin/audit
+--search audit by post body
+http://localhost:8080/blog/admin/audit/body/PostBody
+--search audit by post title
+http://localhost:8080/blog/admin/audit/title/PostTitle
+--search audit by user id
+http://localhost:8080/blog/admin/audit/user/777
