@@ -1,4 +1,12 @@
--Simple welcome page
+
+--How to run the program
+Copy "blog-0.0.1-SNAPSHOT.war" to temp location
+Open the command prompt and go to above location
+run below java command
+java -jar blog-0.0.1-SNAPSHOT.war
+
+
+--Simple welcome page
 http://localhost:8080/blog
 
 --Admin page 
@@ -9,6 +17,7 @@ http://localhost:8080/blog/admin
 http://localhost:8080/blog/admin/users
 --pass the param to see list specific user details (valid values 1 to 10, rest should give error)
 http://localhost:8080/blog/admin/users/2
+
 --all posts by all users
 http://localhost:8080/blog/admin/posts
 --view post by post id (valid values from 1 to 100)
