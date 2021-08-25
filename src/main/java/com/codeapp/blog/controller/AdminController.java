@@ -88,15 +88,13 @@ public class AdminController {
 	// Posts related methods
 	
 	@GetMapping("/posts")
-	public UserPosts[] viewAllPosts(){
-		System.out.println("in ActionController defaultPage");
+	public UserPosts[] viewAllPosts(){		
 		return adminService.viewAllPosts();		
 	}
 	
 	@GetMapping("/posts/{postId}")
 	public UserPosts viewPostById(@PathVariable long postId){
-		UserPosts post = adminService.viewPostById(postId);
-		System.out.println("returned in findPostById:" + post.toString());		
+		UserPosts post = adminService.viewPostById(postId);		
 		return post;
 	}
 	// Audit related methods
