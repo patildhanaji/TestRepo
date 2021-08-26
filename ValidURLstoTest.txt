@@ -30,9 +30,9 @@ http://localhost:8080/blog/admin/users/createpost
 
 --audit info
 http://localhost:8080/blog/admin/audit
---search audit by post body
-http://localhost:8080/blog/admin/audit/body/PostBody
---search audit by post title
-http://localhost:8080/blog/admin/audit/title/PostTitle
---search audit by user id
-http://localhost:8080/blog/admin/audit/user/777
+--search audit by post body, replace "body" below with the postbody you just created
+http://localhost:8080/blog/admin/audit/postbody/body
+--search audit by post title, replace "title" below with the posttitle you just created
+http://localhost:8080/blog/admin/audit/posttitle/title
+--search audit by user id, replace "11" below with the user id you used for post creation
+http://localhost:8080/blog/admin/audit/user/11
