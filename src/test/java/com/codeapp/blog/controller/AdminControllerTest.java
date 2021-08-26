@@ -26,14 +26,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.codeapp.blog.model.AuditInfo;
 import com.codeapp.blog.model.UserDetails;
-import com.codeapp.blog.model.UserDetailsResponseWrapper;
+import com.codeapp.blog.wrapper.UserDetailsResponseWrapper;
 import com.codeapp.blog.model.UserPosts;
 import com.codeapp.blog.service.AdminService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringBootTest
-//@WebMvcTest(AdminController.class)
 public class AdminControllerTest {
 
 	@Autowired
@@ -59,11 +56,7 @@ public class AdminControllerTest {
 	private AuditInfo auditInfoObj1;
 	private AuditInfo auditInfoObj2;
 	private List<AuditInfo> auditInfoObjList;
-
 	
-	// private static final String API_ROOT =
-	// "http://localhost:8081/blog/admin/users";
-
 	@Before
 	public void setUp() throws Exception {
 
@@ -212,8 +205,8 @@ public class AdminControllerTest {
 		
 		mockMvc.perform(MockMvcRequestBuilders.post("/blog/admin/users/createpost")
 				.param("userId", "1")
-				.param("title", "TestTitle")
-				.param("body", "TestBody")
+				.param("postTitle", "TestTitle")
+				.param("postBody", "TestBody")
 				.param("loginUser", "TestUser"))					
 			.andDo(print())
 			.andExpect(status().isOk());						

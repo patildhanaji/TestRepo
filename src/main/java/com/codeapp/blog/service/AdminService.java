@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.codeapp.blog.model.AuditInfo;
 import com.codeapp.blog.model.UserDetails;
-import com.codeapp.blog.model.UserDetailsResponseWrapper;
+import com.codeapp.blog.wrapper.UserDetailsResponseWrapper;
 import com.codeapp.blog.model.UserPosts;
 import com.codeapp.blog.repo.AuditInfoRepo;
 
@@ -32,21 +32,22 @@ public class AdminService {
 	
 	public static final String API_USERS_POSTS_URL_PARAM_ID = "https://jsonplaceholder.typicode.com/users/{uid}/posts";
 	
-	private final RestTemplate restTemplate;
+	private RestTemplate restTemplate;
 	
 	@Autowired
+	RestTemplateBuilder restTemplateBuilder;
+		
+	@Autowired
 	private AuditInfoRepo auditRepo;
-	
-	//autowired was not required so commented..works with or without
-	//@Autowired
+		
 	/**
 	 * Set up RestTemplate
 	 * @param restTemplateBuilder
 	 */
-	public AdminService(RestTemplateBuilder restTemplateBuilder) {
+	public AdminService(RestTemplateBuilder restTemplateBuilder) {		
         this.restTemplate = restTemplateBuilder.build();
     }
-	
+		
 	/** 
 	 * Return all users details
 	 * @return Array of UserDetails object
@@ -63,7 +64,7 @@ public class AdminService {
 	 */
 	public UserDetails viewUserDetailsByID(long userId){
 		// fetch response in a string object
-		return restTemplate.getForObject(API_USERS_URL_PARAM_ID, UserDetails.class, new Object[] {userId});
+		return restTemplate.getForObject(API_USERS_URL_PARAM_ID, UserDetails.class, userId);
 		
 	}
 	
@@ -75,9 +76,9 @@ public class AdminService {
 	public UserDetailsResponseWrapper viewUserDetailsWithPosts(long userId){
 		UserDetailsResponseWrapper wrapper = null;
 		// fetch response in a string object
-		UserDetails userDetails = restTemplate.getForObject(API_USERS_URL_PARAM_ID, UserDetails.class, new Object[]{userId});
+		UserDetails userDetails = restTemplate.getForObject(API_USERS_URL_PARAM_ID, UserDetails.class, userId);
 		
-		UserPosts[] posts = restTemplate.getForObject(API_USERS_POSTS_URL_PARAM_ID, UserPosts[].class, new Object[]{userId});
+		UserPosts[] posts = restTemplate.getForObject(API_USERS_POSTS_URL_PARAM_ID, UserPosts[].class, userId);
 		
 		if(null !=userDetails && null != posts){
 			wrapper = new UserDetailsResponseWrapper(userDetails, posts);			
@@ -91,29 +92,22 @@ public class AdminService {
 	 * @return List of Wrapper objects contacting user and their respective posts
 	 */
 	public List<UserDetailsResponseWrapper> viewAllUserDetailsWithPosts(){
-		List<UserDetailsResponseWrapper> wrapperList = new ArrayList<UserDetailsResponseWrapper>(10);;
-		UserDetailsResponseWrapper usrDtlWrapper= null;
-		boolean validUsers = false;
-		boolean validPosts = false;
+				
 		long userId = 0;
 		List<UserPosts> userPostList = null;
-		
+		UserDetailsResponseWrapper usrDtlWrapper= null;
+		List<UserDetailsResponseWrapper> wrapperList = new ArrayList<UserDetailsResponseWrapper>(10);
+				
 		// fetch response in a string object
-		UserDetails[] userDetails = restTemplate.getForObject(API_USERS_URL, UserDetails[].class);
-		validUsers = null != userDetails && userDetails.length>0;
-		
+		UserDetails[] userDetails = restTemplate.getForObject(API_USERS_URL, UserDetails[].class);				
 		UserPosts[] userPosts = restTemplate.getForObject(API_POSTS_URL, UserPosts[].class);
-		validPosts = null != userPosts && userPosts.length>0;
-		
-		usrDtlWrapper= new UserDetailsResponseWrapper();
-		usrDtlWrapper.setUserDetails(userDetails[0]);
-		
-		if(validUsers){
+						
+		if(null != userDetails && userDetails.length > 0 ){			
 			for(UserDetails usrDtObj : userDetails){
 				usrDtlWrapper= new UserDetailsResponseWrapper();
 				usrDtlWrapper.setUserDetails(usrDtObj);
 				userId = usrDtObj.getId();
-				if(validPosts){
+				if(null != userPosts && userPosts.length > 0){
 					userPostList = new ArrayList<UserPosts>();
 					for(UserPosts pstObj: userPosts){
 						if(userId == pstObj.getUserId()){
@@ -136,9 +130,7 @@ public class AdminService {
 	 */
 	public UserPosts[] viewAllPosts(){
 		// fetch response in a string object		 
-		 UserPosts[] userPosts = restTemplate.getForObject(API_POSTS_URL, UserPosts[].class);
-		
-		 return userPosts;
+		return restTemplate.getForObject(API_POSTS_URL, UserPosts[].class);		
 	}
 	
 	/**
@@ -147,9 +139,7 @@ public class AdminService {
 	 * @return UserPosts object
 	 */
 	public UserPosts viewPostById(long postId){
-		UserPosts postObj = restTemplate.getForObject(API_POSTS_URL_Param_ID, UserPosts.class,new Object[] {postId});
-		//return post[0];
-		return postObj;
+		return restTemplate.getForObject(API_POSTS_URL_Param_ID, UserPosts.class, postId);		
 	}
 		
 	/** Create post on behalf of admin, and populate audit details
@@ -158,25 +148,18 @@ public class AdminService {
 	 * @return - Saved Post object 
 	 */
 	public UserPosts createUserPost(UserPosts newUserPost, String loginUser){
-		UserPosts createdUserPostObj = null;
-		AuditInfo savedAuditInfoObj = null;
+		UserPosts createdUserPostObj = null;		
 	
-		// create a post object
-		//UserPosts newUserPost = new UserPosts(10,"title","book");
-		
-		HttpHeaders headers = new HttpHeaders();
-	    // set `content-type` header
-	    headers.setContentType(MediaType.APPLICATION_JSON);
-	    // set `accept` header
-	    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-	   
+		HttpHeaders headers = new HttpHeaders();	    
+	    headers.setContentType(MediaType.APPLICATION_JSON);	    
+	    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));	   
 	    // build the request
 	    HttpEntity<UserPosts> entity = new HttpEntity<>(newUserPost, headers);
 		
 	    try{
 	    	createdUserPostObj = restTemplate.postForObject(API_POSTS_URL, entity, UserPosts.class);
 		}catch (RestClientException rce){
-	    	savedAuditInfoObj = saveAuditInfo(newUserPost, loginUser, "failed", rce.getMessage());
+	    	saveAuditInfo(newUserPost, loginUser, "failed", rce.getMessage());
 	    	throw rce;
 	    }
 	    	    
@@ -229,11 +212,11 @@ public class AdminService {
 		return auditRepo.findByUserId(userId);					
 	}
 	
-	public List<AuditInfo> viewAuditInfoByPostTitle(String title){
-		return auditRepo.findByPostTitle(title);					
+	public List<AuditInfo> viewAuditInfoByPostTitle(String postTitle){
+		return auditRepo.findByPostTitle(postTitle);					
 	}
 	
-	public List<AuditInfo> viewAuditInfoByPostBody(String body){		
-		return auditRepo.findByPostBody(body);	
+	public List<AuditInfo> viewAuditInfoByPostBody(String postBody){		
+		return auditRepo.findByPostBody(postBody);	
 	}
 }

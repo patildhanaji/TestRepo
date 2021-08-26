@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codeapp.blog.model.AuditInfo;
 import com.codeapp.blog.model.UserDetails;
-import com.codeapp.blog.model.UserDetailsResponseWrapper;
+import com.codeapp.blog.wrapper.UserDetailsResponseWrapper;
 import com.codeapp.blog.model.UserPosts;
 import com.codeapp.blog.service.AdminService;
 
@@ -76,11 +76,11 @@ public class AdminController {
 	 */
 	@PostMapping("/users/createpost")
 	public UserPosts createUserPost(@RequestParam long userId, 
-			@RequestParam String title,
-			@RequestParam String body,
+			@RequestParam String postTitle,
+			@RequestParam String postBody,
 			@RequestParam String loginUser){
 				
-		UserPosts newUserPost = new UserPosts(userId, title, body); 
+		UserPosts newUserPost = new UserPosts(userId, postTitle, postBody); 
 		return adminService.createUserPost(newUserPost, loginUser);	
 		
 	}
@@ -88,13 +88,15 @@ public class AdminController {
 	// Posts related methods
 	
 	@GetMapping("/posts")
-	public UserPosts[] viewAllPosts(){		
+	public UserPosts[] viewAllPosts(){
+		System.out.println("in ActionController defaultPage");
 		return adminService.viewAllPosts();		
 	}
 	
 	@GetMapping("/posts/{postId}")
 	public UserPosts viewPostById(@PathVariable long postId){
-		UserPosts post = adminService.viewPostById(postId);		
+		UserPosts post = adminService.viewPostById(postId);
+		System.out.println("returned in findPostById:" + post.toString());		
 		return post;
 	}
 	// Audit related methods
@@ -119,14 +121,14 @@ public class AdminController {
 		return adminService.viewAuditInfoByUserId(userid);		
 	}
 	
-	@GetMapping("/audit/title/{title}")
-	public List<AuditInfo> viewAuditInfoByPostTitle(@PathVariable String title){
-		return adminService.viewAuditInfoByPostTitle(title);		
+	@GetMapping("/audit/posttitle/{postTitle}")
+	public List<AuditInfo> viewAuditInfoByPostTitle(@PathVariable String postTitle){
+		return adminService.viewAuditInfoByPostTitle(postTitle);		
 	}
 	
-	@GetMapping("/audit/body/{body}")
-	public List<AuditInfo> viewAuditInfoByPostBody(@PathVariable String body){
-		return adminService.viewAuditInfoByPostBody(body);		
+	@GetMapping("/audit/postbody/{postBody}")
+	public List<AuditInfo> viewAuditInfoByPostBody(@PathVariable String postBody){
+		return adminService.viewAuditInfoByPostBody(postBody);		
 	}
 	
 }
